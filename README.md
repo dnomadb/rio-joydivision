@@ -1,5 +1,9 @@
 # rio-joydivision
 
+![image](https://cloud.githubusercontent.com/assets/5084513/10010135/4cb38740-609b-11e5-92e4-348852a7d361.png)
+
+Streams out moody post-punk geojson w/ y-offsets derived from raster data
+
 ```
 Usage: rio joydivision [OPTIONS] INPUTFILE
 
