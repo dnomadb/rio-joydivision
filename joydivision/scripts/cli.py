@@ -19,6 +19,10 @@ from joydivision import __version__ as joy_version
 @click.version_option(version=joy_version, message='%(version)s')
 @click.pass_context
 def joydivision(ctx, inputfile, row_interval, col_interval, scaling_factor, nodata_set):
-    """
-    """
+    '''
+    LOVE\n
+        WILL\n
+            TEAR\n
+                US\n
+                    APART'''
     jd.joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_set)
