@@ -1,0 +1,23 @@
+sudo: false
+language: python
+env:
+  - RASTERIO_VERSION=0.26.0
+addons:
+  apt:
+    packages:
+      - libgdal1h
+      - gdal-bin
+python:
+  - "2.7"
+  - "3.4"
+cache:
+  directories:
+    - $HOME/.pip-cache/
+    - $HOME/wheelhouse
+before_install:
+  - curl -L https://github.com/mapbox/rasterio/releases/download/$RASTERIO_VERSION/rasterio-travis-wheels-$TRAVIS_PYTHON_VERSION.tar.gz > /tmp/wheelhouse.tar.gz
+  - tar -xzvf /tmp/wheelhouse.tar.gz -C $HOME
+install:
+  - pip install --use-wheel --find-links=$HOME/wheelhouse -e .[test] --cache-dir $HOME/.pip-cache
+script: 
+  - py.test
