@@ -29,7 +29,8 @@ setup(name='rio-joydivision',
       zip_safe=False,
       install_requires=[
           'click',
-          'rasterio>=0.26'
+          'rasterio>=0.26',
+          'shapely'
       ],
       extras_require={
           'test': ['pytest'],
