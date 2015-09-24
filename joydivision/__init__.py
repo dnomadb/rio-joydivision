@@ -3,11 +3,14 @@ import numpy as np
 import click
 import json
 
+from shapely.geometry import Polygon
+
 __version__ = '1.1.1'
 
-def offset_rad(lngs, lats, valRow, bounds):
+def offset_rad(lngs, lats, valRow, bounds, scaling_factor):
     return np.concatenate([
-        np.dstack([lngs, lats + valRow / 2000.0])[0],
+        np.dstack([lngs, lats + valRow * scaling_factor])[0],
+        [[bounds.right, lats[-1]]],
         [[bounds.right, bounds.bottom]],
         [[bounds.left, bounds.bottom]],
         [[bounds.left, lats[0]]]
@@ -32,6 +35,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
             ), dtype=src.meta['dtype'])
 
         src.read(1, out=rasVals)
+        cellsize = src.affine.a
 
     if nodata_set:
         rasVals[np.where(rasVals == src.nodata)] = nodata_set
@@ -41,7 +45,10 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
     lngs, lats, = make_point_grid(rows, cols, bounds)
 
     for r in xrange(rows):
-        xy = offset_rad(lngs[r], lats[r], rasVals[r], bounds)
+        xy = offset_rad(lngs[r], lats[r], rasVals[r], bounds, scaling_factor)
+        polygon = Polygon(xy.tolist())
+        polygon = polygon.simplify(cellsize)
+
         click.echo(json.dumps({
             "type": "Feature",
             "properties": {
@@ -49,7 +56,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
             },
             "geometry": {
                 "type": "Polygon",
-                "coordinates": [xy.tolist()]
+                "coordinates": [[xy for xy in polygon.exterior.coords]]
             }
         }))
 
