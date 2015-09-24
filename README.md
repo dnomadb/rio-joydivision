@@ -4,6 +4,14 @@
 
 Streams out moody post-punk geojson w/ y-offsets derived from raster data
 
+## Install
+
+```
+pip install rio-joydivision
+```
+
+## Usage
+
 ```
 Usage: rio joydivision [OPTIONS] INPUTFILE
 
