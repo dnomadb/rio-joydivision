@@ -3,17 +3,23 @@ import numpy as np
 import click
 import json
 
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, LineString
 
 __version__ = '1.1.1'
 
-def offset_rad(lngs, lats, valRow, bounds, scaling_factor):
+def offset_rad_poly(lngs, lats, valRow, bounds, scaling_factor):
     return np.concatenate([
         np.dstack([lngs, lats + valRow * scaling_factor])[0],
         [[bounds.right, lats[-1]]],
         [[bounds.right, bounds.bottom]],
         [[bounds.left, bounds.bottom]],
         [[bounds.left, lats[0]]]
+        ])
+
+def offset_rad_line(lngs, lats, valRow, bounds, scaling_factor):
+    return np.concatenate([
+        np.dstack([lngs, lats + valRow * scaling_factor])[0],
+        [[bounds.right, lats[-1]]]
         ])
 
 def make_point_grid(rows, cols, bounds):
@@ -26,7 +32,7 @@ def make_point_grid(rows, cols, bounds):
     )
 
 
-def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_set):
+def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_set, gtype):
     with rio.open(inputfile) as src:
         bounds = src.bounds
         rasVals = np.zeros((
@@ -44,21 +50,40 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
 
     lngs, lats, = make_point_grid(rows, cols, bounds)
 
-    for r in xrange(rows):
-        xy = offset_rad(lngs[r], lats[r], rasVals[r], bounds, scaling_factor)
-        polygon = Polygon(xy.tolist())
-        polygon = polygon.simplify(cellsize)
 
-        click.echo(json.dumps({
-            "type": "Feature",
-            "properties": {
-                'row': r
-            },
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [[xy for xy in polygon.exterior.coords]]
-            }
-        }))
+    for r in xrange(rows):
+
+        xy = offset_rad_line(lngs[r], lats[r], rasVals[r], bounds, scaling_factor)
+
+        if gtype == 'LineString':
+            polygon = LineString(xy.tolist())
+            polygon = polygon.simplify(cellsize)
+
+            click.echo(json.dumps({
+                "type": "Feature",
+                "properties": {
+                    'row': r
+                },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [xy for xy in polygon.coords]
+                }
+            }))
+
+        else:
+            polygon = Polygon(xy.tolist())
+            polygon = polygon.simplify(cellsize)
+
+            click.echo(json.dumps({
+                "type": "Feature",
+                "properties": {
+                    'row': r
+                },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[xy for xy in polygon.exterior.coords]]
+                }
+            }))
 
 if __name__ == '__main__':
     joydivision()
