@@ -2,7 +2,7 @@ from codecs import open as codecs_open
 from setuptools import setup, find_packages
 
 # Get the long description from the relevant file
-with codecs_open('README.md', encoding='utf-8') as f:
+with codecs_open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 with open('joydivision/__init__.py') as f:
@@ -21,7 +21,7 @@ setup(name='rio-joydivision',
       classifiers=[],
       keywords='',
       author=u"Damon Burgett",
-      author_email='nomad.damon@gmail.com',
+      author_email='damon@mapbox.com',
       url='https://github.com/dnomadb/rio-joydivision',
       license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
@@ -29,7 +29,7 @@ setup(name='rio-joydivision',
       zip_safe=False,
       install_requires=[
           'click',
-          'rasterio>=0.26',
+          'rasterio',
           'shapely'
       ],
       extras_require={
