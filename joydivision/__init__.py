@@ -32,7 +32,7 @@ def make_point_grid(rows, cols, bounds):
     )
 
 
-def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_set, gtype):
+def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_set, bidx, gtype):
     with rio.open(inputfile) as src:
         bounds = src.bounds
         rasVals = np.zeros((
@@ -40,7 +40,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
             int(src.width / float(col_interval))
             ), dtype=src.meta['dtype'])
 
-        src.read(1, out=rasVals)
+        src.read(bidx, out=rasVals)
         cellsize = src.affine.a
 
     if nodata_set:
