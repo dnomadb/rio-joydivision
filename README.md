@@ -2,7 +2,7 @@
 
 ![image](https://cloud.githubusercontent.com/assets/5084513/10010135/4cb38740-609b-11e5-92e4-348852a7d361.png)
 
-Streams out moody post-punk geojson w/ y-offsets derived from raster data
+Streams out moody post-punk geojson w/ y-offsets derived from raster data.
 
 ## Install
 
@@ -30,6 +30,7 @@ Options:
   -c, --col-interval INTEGER  Column interval to sample on [default = 1]
   -f, --scaling-factor FLOAT  Value to scale y-offset by [default = 1.0]
   -n, --nodata-set TEXT       Value to set nodata to [default = None]
+  -b, --bidx INTEGER          Band to offset
   --version                   Show the version and exit.
   --help                      Show this message and exit.
 ```
