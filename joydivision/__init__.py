@@ -3,6 +3,9 @@ import numpy as np
 import click
 import json
 
+
+from rasterio.warp import transform
+from rasterio.crs import CRS
 from shapely.geometry import Polygon, LineString
 
 __version__ = '1.1.1'
@@ -41,7 +44,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
             ), dtype=src.meta['dtype'])
 
         src.read(bidx, out=rasVals)
-        cellsize = src.affine.a
+        cellsize = src.transform.a
 
     if nodata_set:
         rasVals[np.where(rasVals == src.nodata)] = nodata_set
@@ -51,9 +54,9 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
     lngs, lats, = make_point_grid(rows, cols, bounds)
 
 
-    for r in xrange(rows):
+    for r in range(rows):
 
-        xy = offset_rad_line(lngs[r], lats[r], rasVals[r], bounds, scaling_factor)
+        xy = offset_rad_poly(lngs[r], lats[r], rasVals[r], bounds, scaling_factor)
 
         if gtype == 'LineString':
             polygon = LineString(xy.tolist())
@@ -66,7 +69,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
                 },
                 "geometry": {
                     "type": "LineString",
-                    "coordinates": [xy for xy in polygon.coords]
+                    "coordinates": list(zip(*transform(CRS.from_epsg(3857), CRS.from_epsg(4326), *zip(*list(polygon.coords)))))
                 }
             }))
 
@@ -81,7 +84,7 @@ def joydivision(inputfile, row_interval, col_interval, scaling_factor, nodata_se
                 },
                 "geometry": {
                     "type": "Polygon",
-                    "coordinates": [[xy for xy in polygon.exterior.coords]]
+                    "coordinates": [list(zip(*transform(CRS.from_epsg(3857), CRS.from_epsg(4326), *zip(*list(polygon.exterior.coords)))))]
                 }
             }))
 
